@@ -4,3 +4,26 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+clap = { version = "4.5.18" }
+env_logger = { version = "0.11.5" }
+hex = { version = "0.4.3" }
+itertools = { version = "0.13.0" }
+log = { version = "0.4.22" }
+frame-metadata = "20"
+parity-scale-codec = { version = "3.6.12", default-features = false, features = [ "derive", "max-encoded-len" ] }
+regex = { version = "1.11.0" }
+serde = { version = "1.0.210" }
+serde_json = { version = "1.0.128" }
+scale-info = "2.11.6"
+frame-remote-externalities = { git = "https://github.com/paritytech/polkadot-sdk", rev = "8279d1046cca51a317dec15df5a9b29240545163" }
+frame-support = { git = "https://github.com/paritytech/polkadot-sdk", rev = "8279d1046cca51a317dec15df5a9b29240545163" }
+sc-cli = { git = "https://github.com/paritytech/polkadot-sdk", rev = "8279d1046cca51a317dec15df5a9b29240545163" }
+sc-executor = { git = "https://github.com/paritytech/polkadot-sdk", rev = "8279d1046cca51a317dec15df5a9b29240545163" }
+sp-io = { git = "https://github.com/paritytech/polkadot-sdk", rev = "8279d1046cca51a317dec15df5a9b29240545163" }
+sp-externalities = { git = "https://github.com/paritytech/polkadot-sdk", rev = "8279d1046cca51a317dec15df5a9b29240545163" }
+sp-runtime = { git = "https://github.com/paritytech/polkadot-sdk", rev = "8279d1046cca51a317dec15df5a9b29240545163" }
+try-runtime-core = { git = "https://github.com/paritytech/try-runtime-cli/", rev = "95cff0537afe7126830a9d4f672f3baaf227463d" }
+tokio = "1.40"
+
+[patch.'https://github.com/w3f/fflonk']
+fflonk = { git = 'https://github.com/w3f/fflonk?rev=1e854f35e9a65d08b11a86291405cdc95baa0a35', rev = '1e854f35e9a65d08b11a86291405cdc95baa0a35' }
