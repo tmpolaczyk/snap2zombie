@@ -2,10 +2,7 @@ use crate::should_be_public::parse;
 use crate::snap_2_json::Snap2JsonCommand;
 use crate::snap_2_json::run_snap_2_json;
 use clap::Parser;
-use parity_scale_codec::{Decode, DecodeAll};
-use sc_executor::{
-    DEFAULT_HEAP_ALLOC_STRATEGY, HeapAllocStrategy, WasmExecutor, sp_wasm_interface::HostFunctions,
-};
+use sc_executor::sp_wasm_interface::HostFunctions;
 use serde::de::DeserializeOwned;
 use sp_runtime::testing::H256;
 use sp_runtime::traits::Block as BlockT;
@@ -18,7 +15,7 @@ use sp_runtime::{
 use std::env;
 use std::fmt::Debug;
 use std::str::FromStr;
-use try_runtime_core::common::shared_parameters::{Runtime, SharedParams};
+use try_runtime_core::common::shared_parameters::SharedParams;
 
 mod should_be_public;
 

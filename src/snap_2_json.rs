@@ -70,12 +70,10 @@ where
             version_increases: false,
             try_runtime_feature_enabled: false,
         };
-        let ext = state
-            .to_ext::<crate::Block, crate::HostFns>(&shared, &executor, None, runtime_checks)
-            .await
-            .unwrap();
 
-        ext
+        state
+            .to_ext::<crate::Block, crate::HostFns>(&shared, &executor, None, runtime_checks)
+            .await?
     };
 
     let mut ext: RemoteExternalities<crate::Block> = ext;
