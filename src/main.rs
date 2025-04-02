@@ -1,6 +1,6 @@
 use crate::should_be_public::parse;
-use crate::snap_2_json::Snap2JsonCommand;
-use crate::snap_2_json::run_snap_2_json;
+use crate::to_json::ToJsonCommand;
+use crate::to_json::to_json;
 use clap::Parser;
 use sc_executor::sp_wasm_interface::HostFunctions;
 use serde::de::DeserializeOwned;
@@ -18,16 +18,15 @@ use std::str::FromStr;
 use try_runtime_core::common::shared_parameters::SharedParams;
 
 mod should_be_public;
+mod to_json;
 
 type Block = BlockGeneric<Header<u32, BlakeTwo256>, OpaqueExtrinsic>;
 type HostFns = sp_io::SubstrateHostFunctions;
 
-mod snap_2_json;
-
 /// Possible actions of `try-runtime`.
 #[derive(Debug, Clone, clap::Subcommand)]
 pub enum Action {
-    Snap2Json(Snap2JsonCommand),
+    ToJson(ToJsonCommand),
 }
 
 impl Action {
@@ -42,8 +41,8 @@ impl Action {
         HostFns: HostFunctions,
     {
         match self {
-            Action::Snap2Json(cmd) => {
-                run_snap_2_json::<Block, HostFns>(shared.clone(), cmd.clone()).await?;
+            Action::ToJson(cmd) => {
+                to_json::<Block, HostFns>(shared.clone(), cmd.clone()).await?;
             }
         }
 

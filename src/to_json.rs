@@ -5,13 +5,15 @@ use frame_remote_externalities::RemoteExternalities;
 use sc_executor::HostFunctions;
 use sp_runtime::traits::NumberFor;
 use std::fmt::Debug;
+use std::fs::File;
+use std::io::Write;
 use std::str::FromStr;
 use try_runtime_core::common::shared_parameters::SharedParams;
 use try_runtime_core::common::state::{RuntimeChecks, State};
 
-/// Configurations for [`run_snap_2_json`].
+/// Configurations for [`to_json`].
 #[derive(Debug, Clone, clap::Parser)]
-pub struct Snap2JsonCommand {
+pub struct ToJsonCommand {
     /// A pallet to scrape. Can be provided multiple times. If empty, entire chain state will
     /// be scraped.
     ///
@@ -32,9 +34,9 @@ pub struct Snap2JsonCommand {
     pub output_path: String,
 }
 
-pub async fn run_snap_2_json<Block, HostFns>(
+pub async fn to_json<Block, HostFns>(
     shared: SharedParams,
-    command: Snap2JsonCommand,
+    command: ToJsonCommand,
 ) -> sc_cli::Result<()>
 where
     Block: BlockT + serde::de::DeserializeOwned,
@@ -46,10 +48,7 @@ where
     HostFns: HostFunctions,
 {
     let ext = {
-        // TODO: add clap
-        let filename = std::env::args()
-            .nth(1)
-            .expect("Usage: cargo run -- dancebox.snap");
+        let filename = command.snapshot_path;
 
         let state = State::Snap {
             path: Some(filename.into()),
@@ -84,27 +83,51 @@ where
 
     /*
     // This method doesnt work, DO NOT USE IT
-        // ext.into_raw_snapshot() doesn't compile ???
-        let mut sn = ext
-            .backend
-            .backend_storage_mut()
-            .drain()
-            .into_iter()
-            .filter(|(_, (_, r))| *r > 0)
-            .collect::<Vec<(Vec<u8>, (Vec<u8>, i32))>>();
-         */
+    // The resulting "keys" and "values" are not the key and values that you see in the runtime,
+    // but something else
+    // ext.into_raw_snapshot() doesn't compile ???
+    let mut sn = ext
+        .backend
+        .backend_storage_mut()
+        .drain()
+        .into_iter()
+        .filter(|(_, (_, r))| *r > 0)
+        .collect::<Vec<(Vec<u8>, (Vec<u8>, i32))>>();
+     */
 
     // Only keep requested pallet storage
     // PooledStaking
-    let pallet_prefix = hex::decode("359e684ff9b0738b7dc97123fd114c24").unwrap();
-    sn.retain(|(key, (value, refcount))| key.starts_with(&pallet_prefix));
+    //let pallet_prefix = hex::decode("359e684ff9b0738b7dc97123fd114c24").unwrap();
+    let keep_prefixes = command
+        .prefix
+        .into_iter()
+        .map(|x| hex::decode(x).unwrap())
+        .chain(
+            command
+                .pallet
+                .into_iter()
+                .map(|pallet_name| todo!("convert pallet name into hashed prefix")),
+        )
+        .collect::<Vec<_>>();
+
+    if !keep_prefixes.is_empty() {
+        sn.retain(|(key, (value, refcount))| {
+            keep_prefixes
+                .iter()
+                .any(|pallet_prefix| key.starts_with(&pallet_prefix))
+        });
+    }
+
+    // Assuming command.output_path is a String containing the output file path
+    let mut file = File::create(command.output_path)?;
 
     for (key, (value, refcount)) in sn {
-        println!(
+        writeln!(
+            file,
             "\"0x{}\": \"0x{}\",",
             hex::encode(&key),
             hex::encode(&value)
-        );
+        )?;
     }
 
     Ok(())
