@@ -1,3 +1,5 @@
+//! Copies of utils from `try-runtime` that are not public
+
 use sc_cli::execution_method_from_cli;
 use sc_executor::{DEFAULT_HEAP_ALLOC_STRATEGY, HeapAllocStrategy, HostFunctions, WasmExecutor};
 use try_runtime_core::common::shared_parameters::SharedParams;
