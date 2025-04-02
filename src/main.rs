@@ -79,6 +79,8 @@ impl TryRuntime2 {
 
 fn init_env() {
     if env::var(env_logger::DEFAULT_FILTER_ENV).is_err() {
+        // Safety: actually unsound because `tokio::main` starts a multithreaded runtime, so if they
+        // decide to call `set_var` somewhere we got a race condition.
         unsafe {
             env::set_var(env_logger::DEFAULT_FILTER_ENV, "info");
         }

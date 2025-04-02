@@ -2,12 +2,11 @@ use crate::BlockT;
 use crate::parse;
 use crate::should_be_public::build_executor;
 use frame_remote_externalities::RemoteExternalities;
-use sc_cli::{WasmExecutionMethod, WasmtimeInstantiationStrategy};
 use sc_executor::HostFunctions;
 use sp_runtime::traits::NumberFor;
 use std::fmt::Debug;
 use std::str::FromStr;
-use try_runtime_core::common::shared_parameters::{Runtime, SharedParams};
+use try_runtime_core::common::shared_parameters::SharedParams;
 use try_runtime_core::common::state::{RuntimeChecks, State};
 
 /// Configurations for [`run_snap_2_json`].
@@ -51,20 +50,11 @@ where
         let filename = std::env::args()
             .nth(1)
             .expect("Usage: cargo run -- dancebox.snap");
-        let shared = SharedParams {
-            runtime: Runtime::Existing,
-            disable_spec_name_check: false,
-            wasm_method: WasmExecutionMethod::Interpreted,
-            wasmtime_instantiation_strategy: WasmtimeInstantiationStrategy::PoolingCopyOnWrite,
-            heap_pages: None,
-            export_proof: None,
-            overwrite_state_version: None,
-        };
 
         let state = State::Snap {
             path: Some(filename.into()),
         };
-        let executor = build_executor::<crate::HostFns>(&shared);
+        let executor = build_executor::<HostFns>(&shared);
         let runtime_checks = RuntimeChecks {
             name_matches: false,
             version_increases: false,
@@ -72,11 +62,11 @@ where
         };
 
         state
-            .to_ext::<crate::Block, crate::HostFns>(&shared, &executor, None, runtime_checks)
+            .to_ext::<Block, HostFns>(&shared, &executor, None, runtime_checks)
             .await?
     };
 
-    let mut ext: RemoteExternalities<crate::Block> = ext;
+    let mut ext: RemoteExternalities<Block> = ext;
 
     let mut sn = ext.execute_with(|| {
         let mut res = vec![];
