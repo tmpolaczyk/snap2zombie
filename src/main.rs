@@ -1,4 +1,5 @@
 use crate::merge_into_raw::{MergeIntoRawCommand, merge_into_raw};
+use crate::pad_with_spaces::{PadWithSpacesCommand, pad_with_spaces};
 use crate::should_be_public::parse;
 use crate::to_json::ToJsonCommand;
 use crate::to_json::to_json;
@@ -19,6 +20,7 @@ use std::str::FromStr;
 use try_runtime_core::common::shared_parameters::SharedParams;
 
 mod merge_into_raw;
+mod pad_with_spaces;
 mod should_be_public;
 mod to_json;
 
@@ -30,6 +32,7 @@ type HostFns = sp_io::SubstrateHostFunctions;
 pub enum Action {
     ToJson(ToJsonCommand),
     MergeIntoRaw(MergeIntoRawCommand),
+    PadWithSpaces(PadWithSpacesCommand),
 }
 
 impl Action {
@@ -47,9 +50,11 @@ impl Action {
             Action::ToJson(cmd) => {
                 to_json::<Block, HostFns>(shared.clone(), cmd.clone()).await?;
             }
-
             Action::MergeIntoRaw(cmd) => {
                 merge_into_raw::<Block, HostFns>(shared.clone(), cmd.clone()).await?;
+            }
+            Action::PadWithSpaces(cmd) => {
+                pad_with_spaces::<Block, HostFns>(shared.clone(), cmd.clone()).await?;
             }
         }
 

@@ -207,7 +207,9 @@ where
         log::warn!(
             "Output file size is less than 2GB, zombienet will attempt to modify it and that may fail"
         );
-        log::warn!("Use pad-with-spaces subcommand to workaround that");
+        log::warn!(
+            "Use pad-with-spaces subcommand to workaround that. Note that this may not be needed, so try without it first."
+        );
     }
 
     Ok(())
