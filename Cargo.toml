@@ -24,6 +24,7 @@ sp-externalities = { git = "https://github.com/paritytech/polkadot-sdk", rev = "
 sp-runtime = { git = "https://github.com/paritytech/polkadot-sdk", rev = "8279d1046cca51a317dec15df5a9b29240545163" }
 try-runtime-core = { git = "https://github.com/paritytech/try-runtime-cli/", rev = "95cff0537afe7126830a9d4f672f3baaf227463d" }
 tokio = "1.40"
+tempfile = "3.19.1"
 
 [patch.'https://github.com/w3f/fflonk']
 fflonk = { git = 'https://github.com/w3f/fflonk?rev=1e854f35e9a65d08b11a86291405cdc95baa0a35', rev = '1e854f35e9a65d08b11a86291405cdc95baa0a35' }

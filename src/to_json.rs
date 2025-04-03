@@ -56,7 +56,7 @@ where
         .prefix
         .into_iter()
         .map(|x| {
-            hex::decode(x).unwrap_or_else(|_e| {
+            hex::decode(&x).unwrap_or_else(|_e| {
                 panic!(
                     "Failed to parse prefix key, should be in hex format (without leading 0x): {}",
                     x
@@ -139,7 +139,7 @@ let mut sn = ext
     .filter(|(_, (_, r))| *r > 0)
     .collect::<Vec<(Vec<u8>, (Vec<u8>, i32))>>();
  */
-// Only version that loads all the storage key values into memory
+// Old version that loads all the storage key values into memory
 #[allow(unused)]
 pub fn storage_iter_in_mem<Block>(
     ext: &mut RemoteExternalities<Block>,
@@ -158,7 +158,6 @@ where
         while let Some(key) = sp_io::storage::next_key(&prefix) {
             let value = frame_support::storage::unhashed::get_raw(&key).unwrap();
             prefix = key.clone();
-            prefix.push(0x00);
 
             res.push((key, value));
         }
@@ -196,7 +195,6 @@ where
             let key = sp_io::storage::next_key(&self.prefix)?;
             let value = frame_support::storage::unhashed::get_raw(&key).unwrap();
             self.prefix = key.clone();
-            self.prefix.push(0x00);
 
             Some((key, value))
         })

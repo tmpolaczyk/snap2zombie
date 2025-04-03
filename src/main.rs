@@ -1,3 +1,4 @@
+use crate::merge_into_raw::{MergeIntoRawCommand, merge_into_raw};
 use crate::should_be_public::parse;
 use crate::to_json::ToJsonCommand;
 use crate::to_json::to_json;
@@ -17,6 +18,7 @@ use std::fmt::Debug;
 use std::str::FromStr;
 use try_runtime_core::common::shared_parameters::SharedParams;
 
+mod merge_into_raw;
 mod should_be_public;
 mod to_json;
 
@@ -27,6 +29,7 @@ type HostFns = sp_io::SubstrateHostFunctions;
 #[derive(Debug, Clone, clap::Subcommand)]
 pub enum Action {
     ToJson(ToJsonCommand),
+    MergeIntoRaw(MergeIntoRawCommand),
 }
 
 impl Action {
@@ -43,6 +46,10 @@ impl Action {
         match self {
             Action::ToJson(cmd) => {
                 to_json::<Block, HostFns>(shared.clone(), cmd.clone()).await?;
+            }
+
+            Action::MergeIntoRaw(cmd) => {
+                merge_into_raw::<Block, HostFns>(shared.clone(), cmd.clone()).await?;
             }
         }
 
