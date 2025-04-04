@@ -204,7 +204,7 @@ where
 /// Iterate over all storage items. There should be a similar function somewhere in [`frame_support`] but I cannot find it.
 pub fn storage_iter<Block>(
     ext: &mut RemoteExternalities<Block>,
-) -> impl Iterator<Item = (Vec<u8>, Vec<u8>)>
+) -> impl Iterator<Item = (Vec<u8>, Vec<u8>)> + '_
 where
     Block: BlockT + serde::de::DeserializeOwned,
     Block::Hash: serde::de::DeserializeOwned,
