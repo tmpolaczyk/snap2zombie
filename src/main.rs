@@ -1,8 +1,8 @@
-use crate::merge_into_raw::{MergeIntoRawCommand, merge_into_raw};
-use crate::pad_with_spaces::{PadWithSpacesCommand, pad_with_spaces};
+use crate::merge_into_raw::{merge_into_raw, MergeIntoRawCommand};
+use crate::pad_with_spaces::{pad_with_spaces, PadWithSpacesCommand};
 use crate::should_be_public::parse;
-use crate::to_json::ToJsonCommand;
-use crate::to_json::to_json;
+use crate::to_hex_snap::to_hex_snap;
+use crate::to_hex_snap::ToHexSnapCommand;
 use clap::Parser;
 use sc_executor::sp_wasm_interface::HostFunctions;
 use serde::de::DeserializeOwned;
@@ -10,9 +10,9 @@ use sp_runtime::testing::H256;
 use sp_runtime::traits::Block as BlockT;
 use sp_runtime::traits::NumberFor;
 use sp_runtime::{
-    OpaqueExtrinsic,
     generic::{Block as BlockGeneric, Header},
     traits::BlakeTwo256,
+    OpaqueExtrinsic,
 };
 use std::env;
 use std::fmt::Debug;
@@ -23,7 +23,7 @@ use try_runtime_core::common::shared_parameters::SharedParams;
 mod merge_into_raw;
 mod pad_with_spaces;
 mod should_be_public;
-mod to_json;
+mod to_hex_snap;
 
 type Block = BlockGeneric<Header<u32, BlakeTwo256>, OpaqueExtrinsic>;
 type HostFns = sp_io::SubstrateHostFunctions;
@@ -31,8 +31,8 @@ type HostFns = sp_io::SubstrateHostFunctions;
 /// Possible actions of `snap2zombie`.
 #[derive(Debug, Clone, clap::Subcommand)]
 pub enum Action {
-    /// Convert snaphost to hex json format
-    ToJson(ToJsonCommand),
+    /// Convert snaphost to hex snapshot format
+    ToHexSnap(ToHexSnapCommand),
     /// Merge hex snapshot into raw chain spec file
     MergeIntoRaw(MergeIntoRawCommand),
     /// Increase size of a file by padding with a single byte
@@ -54,8 +54,8 @@ impl Action {
         HostFns: HostFunctions,
     {
         match self {
-            Action::ToJson(cmd) => {
-                to_json::<Block, HostFns>(shared.clone(), cmd.clone()).await?;
+            Action::ToHexSnap(cmd) => {
+                to_hex_snap::<Block, HostFns>(shared.clone(), cmd.clone()).await?;
             }
             Action::MergeIntoRaw(cmd) => {
                 merge_into_raw::<Block, HostFns>(shared.clone(), cmd.clone()).await?;
@@ -74,7 +74,7 @@ impl Action {
 
 #[derive(Debug, Clone, clap::Parser)]
 #[command(author, version, about)]
-pub struct TryRuntime2 {
+pub struct App {
     #[clap(flatten)]
     pub shared: SharedParams,
 
@@ -82,7 +82,7 @@ pub struct TryRuntime2 {
     pub action: Action,
 }
 
-impl TryRuntime2 {
+impl App {
     pub async fn run<Block, HostFns>(&self) -> sc_cli::Result<()>
     where
         Block: BlockT<Hash = H256> + DeserializeOwned,
@@ -113,6 +113,6 @@ fn init_env() {
 async fn main() {
     init_env();
 
-    let cmd = TryRuntime2::parse();
+    let cmd = App::parse();
     cmd.run::<Block, HostFns>().await.unwrap();
 }

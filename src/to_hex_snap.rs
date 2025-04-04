@@ -1,6 +1,6 @@
-use crate::BlockT;
 use crate::parse;
 use crate::should_be_public::build_executor;
+use crate::BlockT;
 use frame_remote_externalities::RemoteExternalities;
 use sc_executor::HostFunctions;
 use sp_runtime::app_crypto::sp_core::twox_128;
@@ -13,9 +13,9 @@ use std::str::FromStr;
 use try_runtime_core::common::shared_parameters::SharedParams;
 use try_runtime_core::common::state::{RuntimeChecks, State};
 
-/// Configurations for [`to_json`].
+/// Configurations for [`to_hex_snap`].
 #[derive(Debug, Clone, clap::Parser)]
-pub struct ToJsonCommand {
+pub struct ToHexSnapCommand {
     /// A pallet to scrape. Can be provided multiple times. If empty, entire chain state will
     /// be scraped.
     ///
@@ -36,9 +36,9 @@ pub struct ToJsonCommand {
     pub output_path: String,
 }
 
-pub async fn to_json<Block, HostFns>(
+pub async fn to_hex_snap<Block, HostFns>(
     shared: SharedParams,
-    command: ToJsonCommand,
+    command: ToHexSnapCommand,
 ) -> sc_cli::Result<()>
 where
     Block: BlockT + serde::de::DeserializeOwned,
@@ -139,6 +139,7 @@ let mut sn = ext
     .filter(|(_, (_, r))| *r > 0)
     .collect::<Vec<(Vec<u8>, (Vec<u8>, i32))>>();
  */
+
 // Old version that loads all the storage key values into memory
 #[allow(unused)]
 pub fn storage_iter_in_mem<Block>(
