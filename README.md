@@ -5,7 +5,7 @@ Import a [try-runtime](https://github.com/paritytech/try-runtime-cli) snapshot i
 # Install
 
 ```
-cargo install --path . --locked
+cargo install --git https://github.com/tmpolaczyk/snap2zombie --locked
 ```
 
 # Usage
