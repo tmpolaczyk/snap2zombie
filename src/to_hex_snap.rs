@@ -109,7 +109,7 @@ where
         if !keep_prefixes.is_empty()
             && !keep_prefixes
                 .iter()
-                .any(|pallet_prefix| key.starts_with(&pallet_prefix))
+                .any(|pallet_prefix| key.starts_with(pallet_prefix))
         {
             // Skip this key as it doesn't match any of the requested prefixes
             continue;
