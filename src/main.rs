@@ -17,6 +17,7 @@ use sp_runtime::{
 use std::env;
 use std::fmt::Debug;
 use std::str::FromStr;
+use try_runtime_core::commands::create_snapshot;
 use try_runtime_core::common::shared_parameters::SharedParams;
 
 mod merge_into_raw;
@@ -27,12 +28,18 @@ mod to_json;
 type Block = BlockGeneric<Header<u32, BlakeTwo256>, OpaqueExtrinsic>;
 type HostFns = sp_io::SubstrateHostFunctions;
 
-/// Possible actions of `try-runtime`.
+/// Possible actions of `snap2zombie`.
 #[derive(Debug, Clone, clap::Subcommand)]
 pub enum Action {
+    /// Convert snaphost to hex json format
     ToJson(ToJsonCommand),
+    /// Merge hex snapshot into raw chain spec file
     MergeIntoRaw(MergeIntoRawCommand),
+    /// Increase size of a file by padding with a single byte
     PadWithSpaces(PadWithSpacesCommand),
+    /// Re-export of create-snapshot command from try-runtime, to avoid an extra cargo install if
+    /// the user does not have try-runtime already installed.
+    CreateSnapshot(create_snapshot::Command),
 }
 
 impl Action {
@@ -55,6 +62,9 @@ impl Action {
             }
             Action::PadWithSpaces(cmd) => {
                 pad_with_spaces::<Block, HostFns>(shared.clone(), cmd.clone()).await?;
+            }
+            Action::CreateSnapshot(cmd) => {
+                create_snapshot::run::<Block, HostFns>(shared.clone(), cmd.clone()).await?;
             }
         }
 
