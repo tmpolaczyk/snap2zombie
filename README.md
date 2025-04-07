@@ -20,6 +20,62 @@ And now just use `dancebox-raw-spec-snap.json` in zombienet
 
 Creating a snapshot for dancebox takes 7 minutes as of 2025-04-04
 
+# Subcommands
+
+## create-snapshot
+
+This is just a re-export of the `try-runtime create-snapshot` command, included for convenience and to avoid issues with different snapshot versions.
+Since the latest commit in `try-runtime` repo is from 6 months ago, you probably have the latest version already installed and you can use `try-runtime` for the snapshot.
+
+## to-hex-snap
+
+Extracts the raw key-values from the snapshot file, and saves it using a "hex snapshot" format.
+
+[Snapshot](https://github.com/paritytech/polkadot-sdk/blob/f5de39196e8c30de4bc47a2d46b1a0fe1e9aaee0/substrate/utils/frame/remote-externalities/src/lib.rs#L66) struct
+
+```rust
+const SNAPSHOT_VERSION: SnapshotVersion = Compact(4);
+
+/// The snapshot that we store on disk.
+#[derive(Decode, Encode)]
+struct Snapshot<B: BlockT> {
+	snapshot_version: SnapshotVersion,
+	state_version: StateVersion,
+	// <Vec<Key, (Value, MemoryDbRefCount)>>
+	raw_storage: Vec<(Vec<u8>, (Vec<u8>, i32))>,
+	// The storage root of the state. This may vary from the storage root in the header, if not the
+	// entire state was fetched.
+	storage_root: B::Hash,
+	header: B::Header,
+}
+```
+
+Here you can see the `raw_storage` field which looks like a `Vec<(Key, Value)>`, but it's actually not. Trying to use that directly doesn't work.
+The keys are almost the same as the actual keys except for the last portion, but the values are very different. I guess its some trie-db format.
+If we had a way to decode this without using `ext` code, it would simplify this tool a lot.
+
+The resulting hex snapshot file looks like this:
+
+```
+"0x012345": "0xaabbccdd",
+"0x012346": "0xbbdd",
+```
+
+The idea is to be able to copy-paste it easily into the raw chain spec file.
+
+## merge-into-raw
+
+This command does a smart copy-paste from the hex snapshot into the raw chain spec file.
+It is smart because before inserting the new values it first removes all the storage from the selected pallets.
+
+## pad-with-spaces
+
+This is a hack to artificially increase chain spec file size, because if the output file size is less than 2GB, zombienet will attempt to modify it and that may fail.
+I believe the limit of RAM usage for a node.js program is 1.5 GB, and because of the way zombienet reads the chain spec file, it probably will crash if the chain spec
+is more than 0.8 GB, because it needs to store in memory both the raw string as well as the deserialized object, and then it serializes it again into a string.
+
+[zombienet code](https://github.com/paritytech/zombienet/blob/2564de11ad1513c1a523389ddb665b5a9e93b908/javascript/packages/orchestrator/src/paras.ts#L205)
+
 # Sample run
 
 ```

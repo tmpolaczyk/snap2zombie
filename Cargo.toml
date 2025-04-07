@@ -34,3 +34,8 @@ tempfile = "3.19.1"
 # hack because parity doesn't know how to properly specify a git dependency
 [patch.'https://github.com/w3f/fflonk']
 fflonk = { git = 'https://github.com/w3f/fflonk?rev=1e854f35e9a65d08b11a86291405cdc95baa0a35', rev = '1e854f35e9a65d08b11a86291405cdc95baa0a35' }
+
+[profile.production]
+codegen-units = 1
+inherits = "release"
+lto = true
